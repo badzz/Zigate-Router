@@ -38,11 +38,11 @@
 #include <jendefs.h>
 #include "dbg.h"
 #include "LightingBoard.h"
+#include "app_led_interface.h"
 
 /****************************************************************************/
 /***        Macro Definitions                                             ***/
 /****************************************************************************/
-
 
 /****************************************************************************/
 /***        Type Definitions                                              ***/
@@ -77,11 +77,14 @@
  ****************************************************************************/
 PUBLIC void APP_vLedInitialise(void)
 {
-    bRGB_LED_Enable();
+    /*bRGB_LED_Enable();
     bRGB_LED_Off();
     bWhite_LED_Enable();
     bWhite_LED_Off();
     bWhite_LED_SetLevel(255);
+*/
+    vAHI_DioSetDirection ( 0, LED_DIO_PINS );
+    APP_vSetLed (FALSE);
 }
 
 
@@ -98,7 +101,13 @@ PUBLIC void APP_vLedInitialise(void)
  ****************************************************************************/
 PUBLIC void APP_vSetLed(bool_t bOn)
 {
-    (bOn) ? bWhite_LED_On() : bWhite_LED_Off();
+  //  (bOn) ? bWhite_LED_On() : bWhite_LED_Off();
+    if (bOn)
+		vAHI_DioSetOutput ( LED_DIO_PINS, 0 );
+    else
+		vAHI_DioSetOutput ( 0, LED_DIO_PINS );
+
+
 }
 
 

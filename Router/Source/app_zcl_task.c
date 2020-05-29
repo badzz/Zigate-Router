@@ -57,6 +57,12 @@
 #include <string.h>
 #include "app_reporting.h"
 
+#include "Basic.h"
+#include "PowerConfiguration.h"
+#include "Identify.h"
+#include "OnOff.h"
+
+
 /****************************************************************************/
 /***        Macro Definitions                                             ***/
 /****************************************************************************/
@@ -89,7 +95,7 @@ PRIVATE void APP_vZCL_DeviceSpecific_Init(void);
 /***        Exported Variables                                            ***/
 /****************************************************************************/
 
-tsZHA_BaseDevice sBaseDevice;
+ts_ZigateRouter sBaseDevice;
 
 /****************************************************************************/
 /***        Local Variables                                               ***/
@@ -112,6 +118,7 @@ PRIVATE bool_t bIdentifyState = FALSE;
 PUBLIC void APP_ZCL_vInitialise(void)
 {
     teZCL_Status eZCL_Status;
+    DBG_vPrintf(TRACE_ZCL, "\n APP_ZCL_vInitialise");
 
     /* Initialise ZLL */
     eZCL_Status = eZCL_Initialise(&APP_ZCL_cbGeneralCallback, apduZCL);
@@ -127,19 +134,19 @@ PUBLIC void APP_ZCL_vInitialise(void)
     }
 
     /* Register Light EndPoint */
-   eZCL_Status =  eZHA_RegisterBaseDeviceEndPoint(ROUTER_APPLICATION_ENDPOINT,
+   eZCL_Status =  registerClusters(ROUTER_APPLICATION_ENDPOINT,
                                                    &APP_ZCL_cbEndpointCallback,
                                                    &sBaseDevice);
     if (eZCL_Status != E_ZCL_SUCCESS)
     {
-            DBG_vPrintf(TRACE_ZCL, "Error: eZHA_RegisterBaseDeviceEndPoint: %02x\r\n", eZCL_Status);
+            DBG_vPrintf(TRACE_ZCL, "\nError: registerClusters: %02x\r\n", eZCL_Status);
     }
 
     APP_vZCL_DeviceSpecific_Init();
     APP_vSetLed( sBaseDevice.sOnOffServerCluster.bOnOff);
 }
 
-
+#ifdef CLD_IDENTIFY
 /****************************************************************************
  *
  * NAME: APP_ZCL_vSetIdentifyTime
@@ -156,7 +163,7 @@ PUBLIC void APP_ZCL_vSetIdentifyTime(uint16 u16Time)
     sBaseDevice.sIdentifyServerCluster.u16IdentifyTime = u16Time;
 }
 
-
+#endif
 /****************************************************************************
  *
  * NAME: APP_cbTimerZclTick
@@ -215,7 +222,7 @@ PUBLIC void APP_ZCL_vEventHandler(ZPS_tsAfEvent *psStackEvent)
     tsZCL_CallBackEvent sCallBackEvent;
     sCallBackEvent.pZPSevent = psStackEvent;
 
-    DBG_vPrintf(TRACE_ZCL, "ZCL_Task endpoint event:%d \n", psStackEvent->eType);
+    DBG_vPrintf(TRACE_ZCL, "\nZCL_Task endpoint event:%d", psStackEvent->eType);
     sCallBackEvent.eEventType = E_ZCL_CBET_ZIGBEE_EVENT;
     vZCL_EventHandler(&sCallBackEvent);
 
@@ -307,6 +314,7 @@ PRIVATE void APP_ZCL_cbGeneralCallback(tsZCL_CallBackEvent *psEvent)
  ****************************************************************************/
 PRIVATE void APP_ZCL_cbEndpointCallback(tsZCL_CallBackEvent *psEvent)
 {
+    DBG_vPrintf(TRACE_ZCL, "\nAPP_ZCL_cbEndpointCallback eEvenType: %d",psEvent->eEventType);
 
     switch (psEvent->eEventType)
     {
@@ -391,7 +399,7 @@ PRIVATE void APP_ZCL_cbEndpointCallback(tsZCL_CallBackEvent *psEvent)
             else if(E_ZCL_RESTORE_DEFAULT_REPORT_CONFIGURATION == psEvent->eZCL_Status)
             {
 
-                vRestoreDefaultRecord(app_u8GetDeviceEndpoint(),
+                	(app_u8GetDeviceEndpoint(),
                 		              psEvent->psClusterInstance->psClusterDefinition->u16ClusterEnum,
                 		              psAttributeReportingRecord);
             }			
@@ -399,7 +407,7 @@ PRIVATE void APP_ZCL_cbEndpointCallback(tsZCL_CallBackEvent *psEvent)
         break;
 
         case E_ZCL_CBET_CLUSTER_UPDATE:
-            DBG_vPrintf(TRACE_ZCL, "Update Id %04x\n", psEvent->psClusterInstance->psClusterDefinition->u16ClusterEnum);
+            DBG_vPrintf(TRACE_ZCL, "\nUpdate Id %04x", psEvent->psClusterInstance->psClusterDefinition->u16ClusterEnum);
             APP_vHandleClusterUpdate(psEvent);
             break;
         case E_ZCL_CBET_REPORT_REQUEST:
@@ -493,9 +501,13 @@ PRIVATE void APP_vHandleClusterCustomCommands(tsZCL_CallBackEvent *psEvent)
     {
         case GENERAL_CLUSTER_ID_ONOFF:
         {
+            DBG_vPrintf(TRACE_ZCL, "\nAPP_vHandleClusterCustomCommands onoff: %d\n", sBaseDevice.sOnOffServerCluster.bOnOff);
+           // DBG_vPrintf(TRACE_ZCL, "\nAPP_vHandleClusterCustomCommands button: %d\n", u32AHI_DioReadInput());
+
             APP_vSetLed( sBaseDevice.sOnOffServerCluster.bOnOff);
         }
         break;
+#ifdef CLD_IDENTIFY
 
         case GENERAL_CLUSTER_ID_IDENTIFY:
         {
@@ -506,7 +518,7 @@ PRIVATE void APP_vHandleClusterCustomCommands(tsZCL_CallBackEvent *psEvent)
             }
         }
         break;
-
+#endif
         case GENERAL_CLUSTER_ID_BASIC:
         {
             tsCLD_BasicCallBackMessage *psCallBackMessage = (tsCLD_BasicCallBackMessage*)psEvent->uMessage.sClusterCustomMessage.pvCustomData;
@@ -515,9 +527,12 @@ PRIVATE void APP_vHandleClusterCustomCommands(tsZCL_CallBackEvent *psEvent)
                 DBG_vPrintf(TRACE_ZCL, "Basic Factory Reset Received\n");
                 memset(&sBaseDevice,0,sizeof(tsZHA_BaseDevice));
                 APP_vZCL_DeviceSpecific_Init();
-                eZHA_RegisterBaseDeviceEndPoint(ROUTER_APPLICATION_ENDPOINT,
+ /*               eZHA_RegisterBaseDeviceEndPoint(ROUTER_APPLICATION_ENDPOINT,
                                                 &APP_ZCL_cbEndpointCallback,
-                                                &sBaseDevice);
+                                              &sBaseDevice);*/
+                registerClusters(ROUTER_APPLICATION_ENDPOINT,
+                        &APP_ZCL_cbEndpointCallback,
+                      &sBaseDevice);
             }
         }
         break;
@@ -537,6 +552,8 @@ PRIVATE void APP_vHandleClusterCustomCommands(tsZCL_CallBackEvent *psEvent)
  ****************************************************************************/
 PRIVATE void APP_vHandleClusterUpdate(tsZCL_CallBackEvent *psEvent)
 {
+#ifdef CLD_IDENTIFY
+
     if (psEvent->psClusterInstance->psClusterDefinition->u16ClusterEnum == GENERAL_CLUSTER_ID_IDENTIFY)
     {
         APP_vHandleIdentify(sBaseDevice.sIdentifyServerCluster.u16IdentifyTime);
@@ -549,6 +566,7 @@ PRIVATE void APP_vHandleClusterUpdate(tsZCL_CallBackEvent *psEvent)
             BDB_vZclEventHandler(&sBDBZCLEvent);
         }
     }
+#endif
 }
 
 /****************************************************************************
@@ -566,11 +584,84 @@ PRIVATE void APP_vZCL_DeviceSpecific_Init(void)
 {
     sBaseDevice.sOnOffServerCluster.bOnOff = FALSE;
     memcpy(sBaseDevice.sBasicServerCluster.au8ManufacturerName, "NXP", CLD_BAS_MANUF_NAME_SIZE);
-    memcpy(sBaseDevice.sBasicServerCluster.au8ModelIdentifier, "BDB-Router", CLD_BAS_MODEL_ID_SIZE);
-    memcpy(sBaseDevice.sBasicServerCluster.au8DateCode, "20150212", CLD_BAS_DATE_SIZE);
+    memcpy(sBaseDevice.sBasicServerCluster.au8ModelIdentifier, "Zigate-Router", CLD_BAS_MODEL_ID_SIZE);
+    memcpy(sBaseDevice.sBasicServerCluster.au8DateCode, "20200525", CLD_BAS_DATE_SIZE);
     memcpy(sBaseDevice.sBasicServerCluster.au8SWBuildID, "1000-0001", CLD_BAS_SW_BUILD_SIZE);
 }
 
+PUBLIC teZCL_Status registerClusters (  uint8                         u8EndPointIdentifier,
+        tfpZCL_ZCLCallBackFunction    cbCallBack,
+        ts_ZigateRouter*    psDeviceInfo )
+{
+
+    /* Fill in end point details */
+    psDeviceInfo->sEndPoint.u8EndPointNumber               =  u8EndPointIdentifier;
+    psDeviceInfo->sEndPoint.u16ManufacturerCode            =  ZCL_MANUFACTURER_CODE;
+    psDeviceInfo->sEndPoint.u16ProfileEnum                 =  HA_PROFILE_ID;
+    psDeviceInfo->sEndPoint.bIsManufacturerSpecificProfile =  FALSE;
+    psDeviceInfo->sEndPoint.u16NumberOfClusters            =  sizeof( ts_ZigateRouterClusterInstances ) / sizeof ( tsZCL_ClusterInstance );
+    psDeviceInfo->sEndPoint.psClusterInstance              =  (tsZCL_ClusterInstance*)&psDeviceInfo->sClusterInstance;
+    psDeviceInfo->sEndPoint.bDisableDefaultResponse        =  ZCL_DISABLE_DEFAULT_RESPONSES;
+    psDeviceInfo->sEndPoint.pCallBackFunctions             =  cbCallBack;
+    DBG_vPrintf(TRACE_ZCL, "\n registerClusters basic");
+
+	if ( eCLD_BasicCreateBasic( &psDeviceInfo->sClusterInstance.sBasicServer,
+						   TRUE,
+						   &sCLD_Basic,
+						   &psDeviceInfo->sBasicServerCluster,
+						   &au8BasicClusterAttributeControlBits [ 0 ] ) != E_ZCL_SUCCESS )
+	{
+	// Need to convert from cluster specific to ZCL return type so we lose the extra information of the return code
+		return E_ZCL_FAIL;
+	}
+
+    DBG_vPrintf(TRACE_ZCL, "\n registerClusters power");
+	/* Create an instance of a Power Configuration cluster as a server */
+	if(eCLD_PowerConfigurationCreatePowerConfiguration(&psDeviceInfo->sClusterInstance.sPowerConfigurationServer,
+						  TRUE,
+						  &sCLD_PowerConfiguration,
+						  &psDeviceInfo->sPowerConfigServerCluster,
+						  &au8PowerConfigurationAttributeControlBits[0]) != E_ZCL_SUCCESS)
+	{
+		// Need to convert from cluster specific to ZCL return type so we lose the extra information of the return code
+		return E_ZCL_FAIL;
+	}
+
+#ifdef CLD_IDENTIFY
+
+    DBG_vPrintf(TRACE_ZCL, "\n registerClusters Identify");
+    /* Create an instance of an Identify cluster as a server */
+    if(eCLD_IdentifyCreateIdentify(&psDeviceInfo->sClusterInstance.sIdentifyServer,
+                          TRUE,
+                          &sCLD_Identify,
+                          &psDeviceInfo->sIdentifyServerCluster,
+                          &au8IdentifyAttributeControlBits[0],
+                          &psDeviceInfo->sIdentifyServerCustomDataStructure) != E_ZCL_SUCCESS)
+    {
+        // Need to convert from cluster specific to ZCL return type so we lose the extra information of the return code
+        return E_ZCL_FAIL;
+    }
+#endif
+
+    DBG_vPrintf(TRACE_ZCL, "\n registerClusters onoff");
+    /* Create an instance of an On/Off cluster as a server */
+    if ( eCLD_OnOffCreateOnOff ( &psDeviceInfo->sClusterInstance.sOnOffServer,
+                            TRUE,
+                            &sCLD_OnOff,
+                            &psDeviceInfo->sOnOffServerCluster,
+                            &au8OnOffAttributeControlBits[0],
+                            &psDeviceInfo->sOnOffServerCustomDataStructure )!= E_ZCL_SUCCESS )
+    {
+       // Need to convert from cluster specific to ZCL return type so we lose the extra information of the return code
+       return E_ZCL_FAIL;
+    }
+    DBG_vPrintf(TRACE_ZCL, "\n registerClusters endpoint");
+
+	teZCL_Status status;
+    status= eZCL_Register(&psDeviceInfo->sEndPoint);
+
+	return status;
+}
 /****************************************************************************/
 /***        END OF FILE                                                   ***/
 /****************************************************************************/

@@ -186,12 +186,16 @@ PUBLIC void APP_vInitialiseRouter(void)
     PDM_teStatus eStatusReportReload;
 
     /* Stay awake */
+    DBG_vPrintf(TRACE_APP, "\nAPP_vInitialiseRouter PWRM_eStartActivity");
     PWRM_eStartActivity();
 
+    DBG_vPrintf(TRACE_APP, "\nAPP_vInitialiseRouter APP_vLedInitialise");
     APP_vLedInitialise();
 
+    DBG_vPrintf(TRACE_APP, "\nAPP_vInitialiseRouter APP_bButtonInitialise");
     APP_bButtonInitialise();
 
+    DBG_vPrintf(TRACE_APP, "\nAPP_vInitialiseRouter PDM_eReadDataFromRecord");
     eNodeState = E_STARTUP;
     PDM_eReadDataFromRecord(PDM_ID_APP_ROUTER,
                             &eNodeState,
@@ -208,10 +212,13 @@ PUBLIC void APP_vInitialiseRouter(void)
 #endif
 
     /* Initialise ZBPro stack */
+      DBG_vPrintf(TRACE_APP, "\nAPP_vInitialiseRouter ZPS_eAplAfInit");
     ZPS_eAplAfInit();
 
     /* Initialise ZCL */
+    DBG_vPrintf(TRACE_APP, "\nAPP_vInitialiseRouter APP_ZCL_vInitialise");
     APP_ZCL_vInitialise();
+    DBG_vPrintf(TRACE_APP, "APP_ZCL_vInitialise done\n" );
 
     /* Initialise other software modules
      * HERE
@@ -231,7 +238,7 @@ PUBLIC void APP_vInitialiseRouter(void)
     DBG_vPrintf(TRACE_APP, "PDM: Capacity %d\n", u8PDM_CalculateFileSystemCapacity() );
     DBG_vPrintf(TRACE_APP, "PDM: Occupancy %d\n", u8PDM_GetFileSystemOccupancy() );
 
-    DBG_vPrintf(TRACE_APP, "Start Up StaTe %d On Network %d\n",
+    DBG_vPrintf(TRACE_APP, "Start Up State %d On Network %d\n",
             eNodeState,
             sBDB.sAttrib.bbdbNodeIsOnANetwork);
 
@@ -288,6 +295,7 @@ PUBLIC void APP_vBdbCallback(BDB_tsBdbEvent *psBdbEvent)
             {
                 DBG_vPrintf(TRACE_APP, "BDB Init go Running");
                 eNodeState = E_RUNNING;
+                APP_vSetLed (TRUE);
                 PDM_eSaveRecordData(PDM_ID_APP_ROUTER,&eNodeState,sizeof(teNodeState));
             }
 
@@ -306,7 +314,18 @@ PUBLIC void APP_vBdbCallback(BDB_tsBdbEvent *psBdbEvent)
         case BDB_EVENT_NWK_STEERING_SUCCESS:
             DBG_vPrintf(TRACE_APP,"APP: NwkSteering Success \n");
             eNodeState = E_RUNNING;
+            APP_vSetLed (TRUE);
             PDM_eSaveRecordData(PDM_ID_APP_ROUTER, &eNodeState, sizeof(teNodeState) );
+            break;
+
+        case BDB_EVENT_NO_NETWORK:
+            DBG_vPrintf(TRACE_APP,"APP: BDB_EVENT_NO_NETWORK retrying\n");
+ //           eStatus = BDB_eNsStartNwkSteering();
+//            DBG_vPrintf(TRACE_APP, "BDB Try Steering status %d\n",eStatus);
+            break;
+
+        case BDB_EVENT_NWK_JOIN_FAILURE:
+            DBG_vPrintf(TRACE_APP,"APP: BDB_EVENT_NWK_JOIN_FAILURE \n");
             break;
 
         default:
@@ -370,44 +389,12 @@ PUBLIC void APP_taskRouter(void)
                     }
                     break;
 
-#ifdef APP_NTAG_ICODE
-                case APP_E_BUTTONS_NFC_FD:
-                    DBG_vPrintf(TRACE_APP_EVENT, "APP_EVENT: NFC_FD DOWN\n");
-                    APP_vNtagStart(ROUTER_APPLICATION_ENDPOINT);
-                    break;
-#endif
 
-#ifdef APP_NTAG_AES
-                case APP_E_BUTTONS_NFC_FD:
-                    DBG_vPrintf(TRACE_APP_EVENT, "APP_EVENT: NFC_FD DOWN\n");
-                    APP_vNtagStart(NFC_NWK_NSC_DEVICE_ZIGBEE_ROUTER_DEVICE);
-                    break;
-#endif
 
                 default:
                     break;
             }
         }
-#ifdef APP_NTAG_ICODE
-        else if(sAppEvent.eType == APP_E_EVENT_BUTTON_UP)
-        {
-            if (APP_E_BUTTONS_NFC_FD == sAppEvent.uEvent.sButton.u8Button)
-            {
-                DBG_vPrintf(TRACE_APP_EVENT, "APP_EVENT: NFC_FD UP\n");
-                  APP_vNtagStart(ROUTER_APPLICATION_ENDPOINT);
-            }
-        }
-#endif
-#ifdef APP_NTAG_AES
-        else if(sAppEvent.eType == APP_E_EVENT_BUTTON_UP)
-        {
-            if (APP_E_BUTTONS_NFC_FD == sAppEvent.uEvent.sButton.u8Button)
-            {
-                DBG_vPrintf(TRACE_APP_EVENT, "APP_EVENT: NFC_FD UP\n");
-                  APP_vNtagStart(NFC_NWK_NSC_DEVICE_ZIGBEE_ROUTER_DEVICE);
-            }
-        }
-#endif
         else if (sAppEvent.eType == APP_E_EVENT_LEAVE_AND_RESET)
         {
             if (eNodeState == E_RUNNING)
@@ -459,7 +446,7 @@ PRIVATE void vAppHandleAfEvent( BDB_tsZpsAfEvent *psZpsAfEvent)
 {
     if (psZpsAfEvent->u8EndPoint == ROUTER_APPLICATION_ENDPOINT)
     {
-        DBG_vPrintf(TRACE_APP, "Pass to ZCL\n");
+        DBG_vPrintf(TRACE_APP, "\nPass to ZCL\n");
         if ((psZpsAfEvent->sStackEvent.eType == ZPS_EVENT_APS_DATA_INDICATION) ||
             (psZpsAfEvent->sStackEvent.eType == ZPS_EVENT_APS_INTERPAN_DATA_INDICATION))
         {
@@ -525,16 +512,6 @@ PRIVATE void vAppHandleZdoEvents( BDB_tsZpsAfEvent *psZpsAfEvent)
             DBG_vPrintf(TRACE_APP, "APP-ZDO: Joined Network Addr %04x Rejoin %d\n",
                     psAfEvent->uEvent.sNwkJoinedEvent.u16Addr,
                     psAfEvent->uEvent.sNwkJoinedEvent.bRejoin);
-            #ifdef APP_NTAG_ICODE
-            {
-                /* Not a rejoin ? */
-                if (FALSE == psAfEvent->uEvent.sNwkJoinedEvent.bRejoin)
-                {
-                    /* Write network data to tag */
-                    APP_vNtagStart(ROUTER_APPLICATION_ENDPOINT);
-                }
-            }
-            #endif
             break;
         case ZPS_EVENT_NWK_FAILED_TO_START:
             DBG_vPrintf(TRACE_APP, "APP-ZDO: Network Failed To start\n");
@@ -552,9 +529,17 @@ PRIVATE void vAppHandleZdoEvents( BDB_tsZpsAfEvent *psZpsAfEvent)
             break;
 
         case ZPS_EVENT_NWK_DISCOVERY_COMPLETE:
-            DBG_vPrintf(TRACE_APP, "APP-ZDO: Discovery Complete %02x\n",
-                    psAfEvent->uEvent.sNwkDiscoveryEvent.eStatus);
-            vPrintAPSTable();
+            DBG_vPrintf(TRACE_APP, "APP-ZDO: Discovery Complete %02x selectednetwork:%d\n",
+                    psAfEvent->uEvent.sNwkDiscoveryEvent.eStatus,
+                    psAfEvent->uEvent.sNwkDiscoveryEvent.u8SelectedNetwork);
+            int i ;
+            for (i = 0 ; i != psAfEvent->uEvent.sNwkDiscoveryEvent.u8NetworkCount; i++ ){
+            	ZPS_tsNwkNetworkDescr nwk = psAfEvent->uEvent.sNwkDiscoveryEvent.psNwkDescriptors[i];
+                DBG_vPrintf(TRACE_APP, "network %d ePandID: 0x%16x PermitJoining:%d , RouterCapacity :%d\n",
+                								i,nwk.u64ExtPanId,nwk.u8PermitJoining,nwk.u8RouterCapacity );
+
+            }
+            //vPrintAPSTable();
             break;
 
         case ZPS_EVENT_NWK_LEAVE_INDICATION:

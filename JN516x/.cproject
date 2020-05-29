@@ -94,7 +94,7 @@
 			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 		</cconfiguration>
 		<cconfiguration id="0.876190861.1781733102.485851044.754392318">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="0.876190861.1781733102.485851044.754392318" moduleId="org.eclipse.cdt.core.settings" name="Router, JN5169, DR1175">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="0.876190861.1781733102.485851044.754392318" moduleId="org.eclipse.cdt.core.settings" name="Router, JN5168, DR1175">
 				<externalSettings/>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
@@ -106,11 +106,11 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="JN-AN-1133-ZigBee-Pro-Lightswitch" buildProperties="" description="" id="0.876190861.1781733102.485851044.754392318" name="Router, JN5169, DR1175" parent="org.eclipse.cdt.build.core.prefbase.cfg">
+				<configuration artifactName="JN-AN-1133-ZigBee-Pro-Lightswitch" buildProperties="" description="" id="0.876190861.1781733102.485851044.754392318" name="Router, JN5168, DR1175" parent="org.eclipse.cdt.build.core.prefbase.cfg">
 					<folderInfo id="0.876190861.1781733102.485851044.754392318." name="/" resourcePath="">
 						<toolChain id="com.beyondsemi.toolchain.gnu.ba.elf.base.1954708394" name="BA ELF GNU toolchain" superClass="com.beyondsemi.toolchain.gnu.ba.elf.base">
 							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF" id="com.beyondsemi.target.gnu.platform.ba.elf.1530889585" superClass="com.beyondsemi.target.gnu.platform.ba.elf"/>
-							<builder arguments="JENNIC_CHIP_FAMILY=JN516x JENNIC_CHIP=JN5169 ICODES=0" buildPath="${ProjDirPath}/../Router/Build" command="make" id="com.beyondsemi.builder.cdt.gnu.932048150" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="com.beyondsemi.builder.cdt.gnu"/>
+							<builder arguments="JENNIC_CHIP_FAMILY=JN516x JENNIC_CHIP=JN5168 ICODES=0 APP_NTAG_ICODE=0 TRACE=1" buildPath="${ProjDirPath}/../Router/Build" command="make" id="com.beyondsemi.builder.cdt.gnu.932048150" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="false" superClass="com.beyondsemi.builder.cdt.gnu"/>
 							<tool id="com.beyondsemi.tool.gnu.ba.elf.compiler.c.base.1517427195" name="BA ELF GNU C compiler" superClass="com.beyondsemi.tool.gnu.ba.elf.compiler.c.base">
 								<inputType id="com.beyondsemi.base.ba.elf.c.compiler.input.271870039" superClass="com.beyondsemi.base.ba.elf.c.compiler.input"/>
 								<inputType id="com.beyondsemi.assembler.macro.input.1169716590" superClass="com.beyondsemi.assembler.macro.input"/>
@@ -192,7 +192,7 @@
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="Coordinator_OnOffLightSwitch"/>
 		<configuration configurationName="Coordinator USB Dongle">
-			<resource resourceType="PROJECT" workspacePath="/JN-AN-1217-Zigbee-3-0-Base-Device"/>
+			<resource resourceType="PROJECT" workspacePath="/Zigate-Router"/>
 		</configuration>
 		<configuration configurationName="OTA Client DimmerSwitch">
 			<resource resourceType="PROJECT" workspacePath="/ZSL-Test-App"/>
@@ -200,6 +200,7 @@
 		<configuration configurationName="DimmableLight 1-GP">
 			<resource resourceType="PROJECT" workspacePath="/ZSL-Test-App"/>
 		</configuration>
+		<configuration configurationName="Coordinator, JN5169, DR1199"/>
 		<configuration configurationName="ColorDimmableLight 2"/>
 		<configuration configurationName="ColorDimmableLight 1">
 			<resource resourceType="PROJECT" workspacePath="/ZSL-Test-App"/>
@@ -208,14 +209,16 @@
 			<resource resourceType="PROJECT" workspacePath="/ZSL-Test-App"/>
 		</configuration>
 		<configuration configurationName="Coordinator_Switch">
-			<resource resourceType="PROJECT" workspacePath="/JN-AN-1217-Zigbee-3-0-Base-Device"/>
+			<resource resourceType="PROJECT" workspacePath="/Zigate-Router"/>
 		</configuration>
 		<configuration configurationName="EndDevice_OnOffLightSwitch"/>
+		<configuration configurationName="EndDevice, JN5169, DR1199"/>
+		<configuration configurationName="Router, JN5169, DR1175"/>
 		<configuration configurationName="ColorTempTunableWhiteLight">
 			<resource resourceType="PROJECT" workspacePath="/ZSL-Test-App"/>
 		</configuration>
 		<configuration configurationName="Router_OnOffLight">
-			<resource resourceType="PROJECT" workspacePath="/JN-AN-1217-Zigbee-3-0-Base-Device"/>
+			<resource resourceType="PROJECT" workspacePath="/Zigate-Router"/>
 		</configuration>
 		<configuration configurationName="DimmableLight 3">
 			<resource resourceType="PROJECT" workspacePath="/ZSL-Test-App"/>
@@ -254,16 +257,18 @@
 		<configuration configurationName="ColorDimmableLight 1- GP">
 			<resource resourceType="PROJECT" workspacePath="/ZSL-Test-App"/>
 		</configuration>
-		<configuration configurationName="RemoteControl">
-			<resource resourceType="PROJECT" workspacePath="/ZSL-Test-App"/>
-		</configuration>
 		<configuration configurationName="LightSensor">
 			<resource resourceType="PROJECT" workspacePath="/ZSL-Test-App"/>
 		</configuration>
+		<configuration configurationName="RemoteControl">
+			<resource resourceType="PROJECT" workspacePath="/ZSL-Test-App"/>
+		</configuration>
+		<configuration configurationName="Router, JN5168, DR1175"/>
+		<configuration configurationName="Router"/>
 		<configuration configurationName="ColorDimmerSwitch">
 			<resource resourceType="PROJECT" workspacePath="/ZSL-Test-App"/>
 		</configuration>
-		<configuration configurationName="Router"/>
+		<configuration configurationName="Coordinator, JN5169, DONGLE"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings">

@@ -100,6 +100,9 @@ enum
 #define CLD_ONOFF
 #define ONOFF_SERVER
 
+#define CLD_POWER_CONFIGURATION
+#define POWER_CONFIGURATION_SERVER
+
 /****************************************************************************/
 /*             Basic Cluster - Optional Attributes                          */
 /*                                                                          */
@@ -119,7 +122,7 @@ enum
 #define CLD_BAS_STACK_VERSION       (1)
 #define CLD_BAS_HARDWARE_VERSION    (1)
 #define CLD_BAS_MANUF_NAME_SIZE     (3)
-#define CLD_BAS_MODEL_ID_SIZE       (10)
+#define CLD_BAS_MODEL_ID_SIZE       (13)
 #define CLD_BAS_DATE_SIZE           (8)
 #define CLD_BAS_POWER_SOURCE        E_CLD_BAS_PS_SINGLE_PHASE_MAINS
 #define CLD_BAS_SW_BUILD_SIZE       (9)
@@ -130,16 +133,16 @@ enum
 /* Add the following #define's to your zcl_options.h file to add optional   */
 /* attributes to the identify cluster.                                      */
 /****************************************************************************/
-#define CLD_IDENTIFY_CMD_TRIGGER_EFFECT
-#define CLD_IDENTIFY_10HZ_TICK
+//#define CLD_IDENTIFY_CMD_TRIGGER_EFFECT
+//#define CLD_IDENTIFY_10HZ_TICK
 /****************************************************************************/
 /*             Groups Cluster - Optional Attributes                         */
 /*                                                                          */
 /* Add the following #define's to your zcl_options.h file to add optional   */
 /* attributes to the scenes cluster.                                        */
 /****************************************************************************/
-#define CLD_GROUPS_MAX_NUMBER_OF_GROUPS                     16
-#define CLD_GROUPS_DISABLE_NAME_SUPPORT
+//#define CLD_GROUPS_MAX_NUMBER_OF_GROUPS                     16
+//#define CLD_GROUPS_DISABLE_NAME_SUPPORT
 
 /****************************************************************************/
 /*             OnOff Control Cluster - Optional Attributes                 */

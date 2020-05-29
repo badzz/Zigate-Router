@@ -121,6 +121,7 @@
         #define APP_BUTTONS_NUM             (1UL)
         #if (JENNIC_CHIP_FAMILY == JN516x)
             #define APP_BUTTONS_BUTTON_1        (8)
+
         #elif (JENNIC_CHIP_FAMILY == JN517x)
             #define APP_BUTTONS_BUTTON_1            (4)
         #endif

@@ -79,10 +79,10 @@ DR ?= DR1175
 CFLAGS  += -DBUTTON_MAP_$(DR)
 
 #Always tell any actual drivers they're running under an RTOS in this usage
-CFLAGS  += -DRTOS
+#CFLAGS  += -DRTOS
 
 # Tell the code what target hardware is  
-CFLAGS  += -D$(DR)
+#CFLAGS  += -D$(DR)
 
 # NFC NTAG ICODE (new) functionality
 APP_NTAG_ICODE ?= 1
@@ -125,29 +125,43 @@ endif
 ###############################################################################
 # Debug options define DEBUG either HW or SW
 #DEBUG ?=SW
+DEBUG ?= UART1
 #DEBUG ?=HW
 #
 # Define which UART to use for HW debug
-#DEBUG_PORT ?= UART1
 #  DEBUG_MODE  ?=  SWD    # For ARM core
+
+ifeq ($(DEBUG), UART0)
+$(info Building with debug UART0..)
+DEBUG_PORT ?= UART0
+CFLAGS  += -DUART_DEBUGGING
+CFLAGS  += -DDEBUG_UART=DBG_E_UART_0
+endif
+ifeq ($(DEBUG), UART1)
+$(info Building with debug UART1..)
+DEBUG_PORT ?= UART1
+CFLAGS  += -DUART_DEBUGGING
+CFLAGS  += -DDEBUG_UART=DBG_E_UART_1
+endif
 
 ###############################################################################
 # Define TRACE to use with DBG module
 TRACE ?=1
 ifeq ($(TRACE), 1)
+$(info Building with TRACE 1..)
 CFLAGS += -DDBG_ENABLE
 #CFLAGS += -DDEBUG_921600
 
 # Enable any debug output here:
-#CFLAGS += -DDEBUG_APP
+CFLAGS += -DDEBUG_APP
 CFLAGS += -DDEBUG_APP_BDB
 CFLAGS += -DDEBUG_APP_EVENT
 #CFLAGS += -DDEBUG_BDB
 CFLAGS += -DNXP_HARDWARE
-#CFLAGS += -DDEBUG_ZCL
+CFLAGS += -DDEBUG_ZCL
 CFLAGS +=  -DDEBUG_EXCEPTIONS
-#CFLAGS += -DDEBUG_CLD_IDENTIFY 
-#CFLAGS += -DDEBUG_CLD_ONOFF
+CFLAGS += -DDEBUG_CLD_IDENTIFY 
+CFLAGS += -DDEBUG_CLD_ONOFF
 #CFLAGS += -DDEBUG_CLD_GROUPS
 #CFLAGS  += -DSTRICT_PARAM_CHECK
 CFLAGS += -DDEBUG_APP_BUTTON

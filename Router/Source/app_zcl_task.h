@@ -55,8 +55,11 @@
 
 #include <jendefs.h>
 #include "zcl.h"
-#include "base_device.h"
-
+//#include "base_device.h"
+#include "OnOff.h"
+#include "Basic.h"
+#include "Identify.h"
+#include "PowerConfiguration.h"
 /****************************************************************************/
 /***        Macro Definitions                                             ***/
 /****************************************************************************/
@@ -64,6 +67,35 @@
 /****************************************************************************/
 /***        Type Definitions                                              ***/
 /****************************************************************************/
+typedef struct
+{
+    tsZCL_ClusterInstance sBasicServer;
+	tsZCL_ClusterInstance sPowerConfigurationServer;
+    tsZCL_ClusterInstance sIdentifyServer;
+    tsZCL_ClusterInstance sOnOffServer;
+
+
+} ts_ZigateRouterClusterInstances  __attribute__ ((aligned(4)));
+
+typedef struct
+{
+    tsZCL_EndPointDefinition sEndPoint;
+
+    /* Cluster instances */
+    ts_ZigateRouterClusterInstances sClusterInstance;
+
+    /* Mandatory server clusters */
+    /* Basic Cluster - Server */
+    tsCLD_Basic sBasicServerCluster;
+    tsCLD_PowerConfiguration sPowerConfigServerCluster;
+    tsCLD_OnOff sOnOffServerCluster;
+    tsCLD_Identify sIdentifyServerCluster;
+    tsCLD_OnOffCustomDataStructure sOnOffServerCustomDataStructure;
+    tsCLD_IdentifyCustomDataStructure sIdentifyServerCustomDataStructure;
+
+
+
+} ts_ZigateRouter;
 
 /****************************************************************************/
 /***        Exported Functions                                            ***/
@@ -76,11 +108,15 @@ PUBLIC void APP_ZCL_vEventHandler(ZPS_tsAfEvent *psStackEvent);
 #ifdef CLD_IDENTIFY_10HZ_TICK
     PUBLIC void vIdEffectTick(uint8 u8Endpoint);
 #endif
+    PUBLIC teZCL_Status registerClusters (  uint8                         u8EndPointIdentifier,
+            tfpZCL_ZCLCallBackFunction    cbCallBack,
+            ts_ZigateRouter*    psDeviceInfo );
 /****************************************************************************/
 /***        Exported Variables                                            ***/
 /****************************************************************************/
 
-extern tsZHA_BaseDevice sBaseDevice;
+extern ts_ZigateRouter sBaseDevice;
+
 
 #endif /* APP_ZCL_TASK_H_ */
 

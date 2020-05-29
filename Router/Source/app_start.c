@@ -64,6 +64,8 @@
 #include "app_ntag_aes.h"
 #endif
 
+#include "app_led_interface.h"
+
 /****************************************************************************/
 /***        Macro Definitions                                             ***/
 /****************************************************************************/
@@ -120,12 +122,13 @@ PUBLIC void vAppMain(void)
     while (bAHI_GetClkSource() == TRUE);
 
     /* Move CPU to 32 MHz  vAHI_OptimiseWaitStates automatically called */
-    bAHI_SetClockRate(3);
+    //bAHI_SetClockRate(3);
 #endif
+
 
     /* Initialise the debug diagnostics module to use UART0 at 115K Baud;
      * Do not use UART 1 if LEDs are used, as it shares DIO with the LEDS */
-    DBG_vUartInit(DBG_E_UART_0, DBG_E_UART_BAUD_RATE_115200);
+    DBG_vUartInit(DEBUG_UART, DBG_E_UART_BAUD_RATE_115200);
     #ifdef DEBUG_921600
     {
         /* Bump baud rate up to 921600 */
@@ -150,6 +153,10 @@ PUBLIC void vAppMain(void)
         while (1);
 #endif
     }
+
+    vAHI_DioSetDirection ( 0, LED_DIO_PINS );
+    APP_vSetLed (FALSE);
+
 
     /* idle task commences here */
     DBG_vPrintf(TRUE,"\n");
@@ -190,7 +197,7 @@ PUBLIC void vAppMain(void)
     }
 #endif
 
-    DBG_vPrintf(TRACE_APP, "APP: Entering APP_vMainLoop()\n");
+    DBG_vPrintf(TRACE_APP, "\nAPP: Entering APP_vMainLoop()");
     APP_vMainLoop();
 }
 
@@ -231,15 +238,21 @@ PRIVATE void APP_vInitialise(void)
 {
     /* Initialise Power Manager even on non-sleeping nodes as it allows the
      * device to doze when in the idle task */
+    DBG_vPrintf(TRACE_APP, "\nAPP: APP_vInitialise PWRM_vInit()");
     PWRM_vInit(E_AHI_SLEEP_OSCON_RAMON);
 
-    /* Initialise the Persistent Data Manager */
+    DBG_vPrintf(TRACE_APP, "\nAPP: APP_vInitialise PDM_eInitialise()");
+   /* Initialise the Persistent Data Manager */
     PDM_eInitialise(63);
 
+    DBG_vPrintf(TRACE_APP, "\nAPP: APP_vInitialise PDUM_vInit()");
     /* Initialise Protocol Data Unit Manager */
     PDUM_vInit();
 
+    DBG_vPrintf(TRACE_APP, "\nAPP: APP_vInitialise ZPS_vExtendedStatusSetCallback()");
     ZPS_vExtendedStatusSetCallback(vfExtendedStatusCallBack);
+
+    DBG_vPrintf(TRACE_APP, "\nAPP: APP_vInitialise APP_vInitialiseRouter()");
 
     /* Initialise application */
     APP_vInitialiseRouter();

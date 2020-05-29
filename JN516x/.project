@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>JN-AN-1217-Zigbee-3-0-Base-Device</name>
+	<name>Zigate-Router</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -82,22 +82,27 @@
 		<link>
 			<name>Common</name>
 			<type>2</type>
-			<location>C:/NXP/bstudio_nxp/workspace/JN-AN-1217-Zigbee-3-0-Base-Device/Common</location>
+			<location>C:/NXP/bstudio_nxp/workspace/Zigate-Router/Common</location>
 		</link>
 		<link>
 			<name>Coordinator</name>
 			<type>2</type>
-			<location>C:/NXP/bstudio_nxp/workspace/JN-AN-1217-Zigbee-3-0-Base-Device/Coordinator</location>
+			<location>C:/NXP/bstudio_nxp/workspace/Zigate-Router/Coordinator</location>
 		</link>
 		<link>
 			<name>EndDevice</name>
 			<type>2</type>
-			<location>C:/NXP/bstudio_nxp/workspace/JN-AN-1217-Zigbee-3-0-Base-Device/EndDevice</location>
+			<location>C:/NXP/bstudio_nxp/workspace/Zigate-Router/EndDevice</location>
+		</link>
+		<link>
+			<name>JN-SW-4170</name>
+			<type>2</type>
+			<locationURI>ECLIPSE_HOME/sdk/JN-SW-4170</locationURI>
 		</link>
 		<link>
 			<name>Router</name>
 			<type>2</type>
-			<location>C:/NXP/bstudio_nxp/workspace/JN-AN-1217-Zigbee-3-0-Base-Device/Router</location>
+			<location>C:/NXP/bstudio_nxp/workspace/Zigate-Router/Router</location>
 		</link>
 	</linkedResources>
 </projectDescription>

@@ -147,16 +147,16 @@ PUBLIC void APP_vMainLoop(void)
 
     while (TRUE)
     {
-        DBG_vPrintf(FALSE, "APP: Entering zps_taskZPS\n");
+     //   DBG_vPrintf(TRACE_APP, "APP: Entering zps_taskZPS\n");
         zps_taskZPS();
 
-        DBG_vPrintf(FALSE, "APP: Entering bdb_taskBDB\n");
+     //   DBG_vPrintf(TRACE_APP, "APP: Entering bdb_taskBDB\n");
         bdb_taskBDB();
 
-        DBG_vPrintf(FALSE, "APP: Entering ZTIMER_vTask\n");
+     //   DBG_vPrintf(TRACE_APP, "APP: Entering ZTIMER_vTask\n");
         ZTIMER_vTask();
 
-        DBG_vPrintf(FALSE, "APP: Entering APP_taskRouter\n");
+     //   DBG_vPrintf(TRACE_APP, "APP: Entering APP_taskRouter\n");
         APP_taskRouter();
 
         /* Re-load the watch-dog timer. Execution must return through the idle

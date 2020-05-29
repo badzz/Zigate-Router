@@ -45,6 +45,8 @@
 #include "zcl_options.h"
 #include "zcl_common.h"
 #include "app_reporting.h"
+#include "OnOff.h"
+
 #ifdef CLD_GROUPS
 #include "Groups.h"
 #include "OnOff.h"
